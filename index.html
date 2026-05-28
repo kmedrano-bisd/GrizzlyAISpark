@@ -6,18 +6,13 @@
   <title>BISD Grizzly AI Spark Student Portal</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
-  
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
@@ -27,295 +22,39 @@
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
-    // SVG Icons Map to replace lucide-react cleanly in single-file execution
     const Icons = {
-      Sparkles: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/><path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5Z"/><path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1Z"/></svg>
-      ),
-      BookOpen: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-      ),
-      Binary: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="12" x="2" y="6" rx="1"/><rect width="8" height="12" x="14" y="6" rx="1"/><path d="M6 10h.01"/><path d="M18 10h.01"/></svg>
-      ),
-      Compass: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-      ),
-      Atom: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12a15.3 15.3 0 0 1 10-4 15.3 15.3 0 0 1 10 4 15.3 15.3 0 0 1-10 4 15.3 15.3 0 0 1-10-4z"/></svg>
-      ),
-      Palette: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.7255 3.09032 17.1962 4.85857 19C5.03453 19.176 5.12251 19.264 5.15875 19.3514C5.19499 19.4388 5.17643 19.5494 5.13931 19.7706L5.05194 20.2913C4.95475 20.8711 5.39955 21.3912 5.98739 21.3117L6.68537 21.2172C6.91404 21.1862 7.02838 21.1707 7.13524 21.2001C7.2421 21.2295 7.33408 21.3019 7.51804 21.4468C8.79093 21.8016 10.3341 22 12 22Z"/><circle cx="7.5" cy="10.5" r="1.5"/><circle cx="11.5" cy="7.5" r="1.5"/><circle cx="16.5" cy="9.5" r="1.5"/></svg>
-      ),
-      Search: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      ),
-      Copy: ({ size = 16 }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-      ),
-      Check: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-      ),
-      Send: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-      ),
-      ShieldAlert: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
-      ),
-      ArrowRight: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-      ),
-      Info: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-      ),
-      ExternalLink: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
-      ),
-      Lock: ({ size = 14 }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      ),
-      Star: ({ size = 18 }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      ),
-      RefreshCw: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
-      ),
-      Layers: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polygon points="2 17 12 22 22 17"/><polygon points="2 12 12 17 22 12"/></svg>
-      ),
-      CheckCircle2: ({ size = 12 }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-      ),
-      AlertCircle: ({ size = 48 }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
-      ),
-      Terminal: ({ size = 14 }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
-      ),
-      Sliders: ({ size = 14 }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" h1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="2" x2="6" y1="14" y2="14"/><line x1="10" x2="14" y1="8" y2="8"/><line x1="18" x2="22" y1="16" y2="16"/></svg>
-      )
+      Sparkles: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/><path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5Z"/><path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1Z"/></svg>),
+      BookOpen: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>),
+      Binary: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="12" x="2" y="6" rx="1"/><rect width="8" height="12" x="14" y="6" rx="1"/><path d="M6 10h.01"/><path d="M18 10h.01"/></svg>),
+      Compass: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>),
+      Atom: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12a15.3 15.3 0 0 1 10-4 15.3 15.3 0 0 1 10 4 15.3 15.3 0 0 1-10 4 15.3 15.3 0 0 1-10-4z"/></svg>),
+      Palette: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.7255 3.09032 17.1962 4.85857 19C5.03453 19.176 5.12251 19.264 5.15875 19.3514C5.19499 19.4388 5.17643 19.5494 5.13931 19.7706L5.05194 20.2913C4.95475 20.8711 5.39955 21.3912 5.98739 21.3117L6.68537 21.2172C6.91404 21.1862 7.02838 21.1707 7.13524 21.2001C7.2421 21.2295 7.33408 21.3019 7.51804 21.4468C8.79093 21.8016 10.3341 22 12 22Z"/><circle cx="7.5" cy="10.5" r="1.5"/><circle cx="11.5" cy="7.5" r="1.5"/><circle cx="16.5" cy="9.5" r="1.5"/></svg>),
+      Search: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>),
+      Copy: ({ size = 16 }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>),
+      Check: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>),
+      Send: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>),
+      ShieldAlert: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>),
+      Info: () => (<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>),
+      ExternalLink: () => (<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>),
+      Lock: ({ size = 14 }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>),
+      Layers: () => (<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polygon points="2 17 12 22 22 17"/><polygon points="2 12 12 17 22 12"/></svg>),
+      Terminal: ({ size = 14 }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>),
+      Sliders: ({ size = 14 }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" h1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="2" x2="6" y1="14" y2="14"/><line x1="10" x2="14" y1="8" y2="8"/><line x1="18" x2="22" y1="16" y2="16"/></svg>)
     };
 
-    // ClassLink Approved App Data - UPDATED WITH MAGIC SCHOOL AI
     const CLASSLINK_APPS = [
-      {
-        id: 'canva',
-        name: 'Canva for Education',
-        description: 'Use "Magic Write" to brainstorm ideas, outlines, and get creative art suggestions.',
-        safetyBadge: 'Safe / BISD Approved',
-        color: 'from-purple-500 to-indigo-600',
-        iconName: 'Palette',
-        tip: 'Launch Canva from ClassLink, create a new doc, and click the blue "Magic Write" sparkles!'
-      },
-      {
-        id: 'google',
-        name: 'Google Docs / Drive',
-        description: 'Use the "Help me write" AI tool inside your school Google account for drafting and editing feedback.',
-        safetyBadge: 'Safe / BISD Managed',
-        color: 'from-blue-500 to-indigo-700',
-        iconName: 'BookOpen',
-        tip: 'Click the pencil with sparkles icon next to your paragraph to rewrite or check for tone.'
-      },
-      {
-        id: 'adobe',
-        name: 'Adobe Express',
-        description: 'Use safe Generative AI to design flyers, edit imagery, or generate safe vector graphics.',
-        safetyBadge: 'Safe / BISD Approved',
-        color: 'from-red-500 to-pink-600',
-        iconName: 'Compass',
-        tip: 'Use simple descriptive keywords to generate backgrounds for your class slides!'
-      },
-      {
-        id: 'schoolai',
-        name: 'SchoolAI Spaces',
-        description: 'Explore history, talk to characters, and do interactive research in secure, class-safe chat environments.',
-        safetyBadge: 'Highly Secure AI',
-        color: 'from-[#0B2240] to-teal-800',
-        iconName: 'Atom',
-        tip: 'Your teacher will provide a specific Space Code to join games and historical roleplays.'
-      },
-      {
-        id: 'snorkl',
-        name: 'Snorkl AI',
-        description: 'Explain your math and science reasoning out loud, and get friendly AI feedback on your thinking.',
-        safetyBadge: 'Safe Class Tool',
-        color: 'from-amber-500 to-orange-600',
-        iconName: 'Binary',
-        tip: 'Always click "Record Voice" to explain your drawing step-by-step for the best feedback!'
-      },
-      {
-        id: 'magicschool',
-        name: 'MagicSchool AI (Student)',
-        description: 'Safely practice logic, solve questions with interactive chatbots, and write drafts in a restricted school zone.',
-        safetyBadge: 'Safe / BISD Approved',
-        color: 'from-amber-600 to-rose-700',
-        iconName: 'Sparkles',
-        tip: 'Launch from ClassLink and ask your teacher for a Magic Room Student Code to begin assignments!'
-      }
+      { id: 'canva', name: 'Canva for Education' },
+      { id: 'google', name: 'Google Docs / Drive' },
+      { id: 'adobe', name: 'Adobe Express' },
+      { id: 'schoolai', name: 'SchoolAI Spaces' },
+      { id: 'snorkl', name: 'Snorkl AI' },
+      { id: 'magicschool', name: 'MagicSchool AI (Student)' }
     ];
 
-    // Subject-Specific Prompts ("Gems") Data
     const PROMPT_GEMS = [
-      // ELA PROMPTS
-      {
-        id: 'ela-1',
-        subject: 'ELA',
-        title: 'The Paragraph Drafting Coach',
-        shortDesc: 'Brainstorm and plan an introduction with 3 helpful questions.',
-        appTarget: 'google',
-        objective: 'Help outline your essay structure without writing it for you.',
-        promptText: 'Act as a friendly middle school writing coach. I will give you my main idea or thesis for an essay about [Insert Topic], and you will ask me three guiding questions to help me write a strong introduction paragraph. Do not write the paragraph for me!',
-        placeholders: ['[Insert Topic]']
-      },
-      {
-        id: 'ela-2',
-        subject: 'ELA',
-        title: 'The Vocabulary Storyteller',
-        shortDesc: 'Practice using new vocab words in a funny, short story.',
-        appTarget: 'canva',
-        objective: 'Create a memorable story context for weekly vocabulary words.',
-        promptText: 'I am studying these middle school vocabulary words: [Insert Words]. Write a short, funny story (under 150 words) using all of these words. Bold each vocabulary word so I can see how they are used.',
-        placeholders: ['[Insert Words]']
-      },
-      {
-        id: 'ela-3',
-        subject: 'ELA',
-        title: 'Book Character Interview',
-        shortDesc: 'Bring your favorite literary characters to life.',
-        appTarget: 'schoolai',
-        objective: 'Engage in a deep Socratic discussion as a literary character.',
-        promptText: 'Act as [Insert Character] from the book [Insert Book Name]. I want to interview you for a class project. I will ask you questions one by one. Start by introducing yourself and welcoming me.',
-        placeholders: ['[Insert Character]', '[Insert Book Name]']
-      },
-
-      // MATH PROMPTS
-      {
-        id: 'math-1',
-        subject: 'Math',
-        title: 'The Step-by-Step Tutor',
-        shortDesc: 'Get clues and step-by-step guidance on hard problems.',
-        appTarget: 'snorkl',
-        objective: 'Understand math operations instead of just getting the answer.',
-        promptText: 'Act as an encouraging middle school math teacher. Do not give me the final answer directly. Help me solve this math problem step-by-step: [Insert Problem]. First, ask me what my first step should be.',
-        placeholders: ['[Insert Problem]']
-      },
-      {
-        id: 'math-2',
-        subject: 'Math',
-        title: 'Real-World Math Explainer',
-        shortDesc: 'Find out how concepts are used in fun jobs or hobbies.',
-        appTarget: 'google',
-        objective: 'Relate abstract math concepts to sports, cooking, or gaming.',
-        promptText: 'How does the math concept [Insert Concept, e.g., ratios, fractions, slope] apply to a real-world activity like sports, video games, or baking? Give me two super cool, simple examples.',
-        placeholders: ['[Insert Concept, e.g., ratios, fractions, slope]']
-      },
-      {
-        id: 'math-3',
-        subject: 'Math',
-        title: 'Word Problem Decoder',
-        shortDesc: 'Translate confusing paragraph problems into clean math equations.',
-        appTarget: 'snorkl',
-        objective: 'Identify variables and operations in complex math stories.',
-        promptText: 'I have a math word problem that is confusing me: [Insert Word Problem]. Don\'t solve it for me yet. Instead, help me break down what the problem is asking me to find and list the key clues/numbers in it.',
-        placeholders: ['[Insert Word Problem]']
-      },
-
-      // SCIENCE PROMPTS
-      {
-        id: 'science-1',
-        subject: 'Science',
-        title: 'Simple Concept Analogy Maker',
-        shortDesc: 'Translate heavy textbook topics into funny everyday metaphors.',
-        appTarget: 'google',
-        objective: 'Simplify molecular, ecological, or physical science ideas.',
-        promptText: 'Explain the scientific concept of [Insert Topic, e.g., photosynthesis, gravity] to a 7th grader using a fun, everyday analogy. Keep it under 200 words and make it exciting!',
-        placeholders: ['[Insert Topic, e.g., photosynthesis, gravity]']
-      },
-      {
-        id: 'science-2',
-        subject: 'Science',
-        title: 'Lab Hypothesis Helper',
-        shortDesc: 'Formulate a perfect "If... Then... Because..." scientific statement.',
-        appTarget: 'canva',
-        objective: 'Build proper experimental foundations for science projects.',
-        promptText: 'I am doing a science lab experiment about [Insert Experiment Topic]. My variable is [Insert Variable]. Help me brainstorm a solid "If... then... because..." hypothesis. Guide me through it.',
-        placeholders: ['[Insert Experiment Topic]', '[Insert Variable]']
-      },
-      {
-        id: 'science-3',
-        subject: 'Science',
-        title: 'The Science Myth Buster',
-        shortDesc: 'Investigate common myths to see if they are fact or fiction.',
-        appTarget: 'schoolai',
-        objective: 'Encourage critical thinking and research checkups.',
-        promptText: 'Is it true that [Insert Science Myth, e.g., lightning never strikes twice]? Explain the real science behind it in a simple way that middle schoolers can easily understand.',
-        placeholders: ['[Insert Science Myth, e.g., lightning never strikes twice]']
-      },
-
-      // SOCIAL STUDIES PROMPTS
-      {
-        id: 'ss-1',
-        subject: 'Social Studies',
-        title: 'History Time Traveler Chat',
-        shortDesc: 'Interview individuals from historical eras directly.',
-        appTarget: 'schoolai',
-        objective: 'Empathize with people from different periods of history.',
-        promptText: 'Act as a person living in [Insert Era/Location, e.g., Ancient Rome, Texas in 1836]. Introduce yourself, tell me what a typical day is like for you, and ask me one question about the modern world.',
-        placeholders: ['[Insert Era/Location, e.g., Ancient Rome, Texas in 1836]']
-      },
-      {
-        id: 'ss-2',
-        subject: 'Social Studies',
-        title: 'Historical Perspectives Debate',
-        shortDesc: 'Understand opposing sides of major historical events.',
-        appTarget: 'google',
-        objective: 'Explore cause and effect and historical context.',
-        promptText: 'I am learning about [Insert Event, e.g., the signing of the Magna Carta]. Help me understand two different perspectives or viewpoints of people who lived during that time.',
-        placeholders: ['[Insert Event, e.g., the signing of the Magna Carta]']
-      },
-      {
-        id: 'ss-3',
-        subject: 'Social Studies',
-        title: 'Geography Tour Guide',
-        shortDesc: 'Get a quick local perspective on landmarks and culture.',
-        appTarget: 'canva',
-        objective: 'Prepare virtual tourism brochures or travel journals.',
-        promptText: 'I am researching [Insert Country/Region]. Act as a local tour guide and tell me 3 unique geographical features or landmarks I should visit, plus one cool cultural custom I should know about.',
-        placeholders: ['[Insert Country/Region]']
-      },
-
-      // ELECTIVES PROMPTS
-      {
-        id: 'elec-1',
-        subject: 'Electives',
-        title: 'The Art Block Breaker',
-        shortDesc: 'Generate clever, highly creative drawing prompts.',
-        appTarget: 'adobe',
-        objective: 'Overcome art block with cool mashup suggestions.',
-        promptText: 'I want to draw/paint something but I have artist\'s block. My favorite things are [Insert Interests, e.g., space, animals, gaming]. Give me 3 unique, specific drawing prompts combining these things!',
-        placeholders: ['[Insert Interests, e.g., space, animals, gaming]']
-      },
-      {
-        id: 'elec-2',
-        subject: 'Electives',
-        title: 'Code Debugging Buddy',
-        shortDesc: 'Find errors in Scratch, Python, or HTML blocks easily.',
-        appTarget: 'google',
-        objective: 'Locate bugs and teach coding concepts logically.',
-        promptText: 'Act as a middle school computer science tutor. I am trying to code something in [Insert Language, e.g., Scratch, Python, HTML] and it\'s not working. Here is what I want it to do, and what is happening: [Insert Details]. Help me figure out how to debug it step-by-step without giving the whole code block right away.',
-        placeholders: ['[Insert Language, e.g., Scratch, Python, HTML]', '[Insert Details]']
-      },
-      {
-        id: 'elec-3',
-        subject: 'Electives',
-        title: 'Songwriting Chorus Collaborator',
-        shortDesc: 'Co-write a catchy musical hook about any topic.',
-        appTarget: 'canva',
-        objective: 'Introduce music metrics, beat tempos, and lyric writing.',
-        promptText: 'Help me write a school-safe song about [Insert Theme, e.g., starting middle school]. Help me brainstorm a catchy 4-line chorus. First, ask me what style/mood of music I want.',
-        placeholders: ['[Insert Theme, e.g., starting middle school]']
-      }
+      { id: 'ela-1', subject: 'ELA', title: 'The Paragraph Drafting Coach', shortDesc: 'Brainstorm an introduction with 3 helpful questions.', promptText: 'Act as a friendly middle school writing coach. I will give you my main idea for an essay about [Insert Topic], and you will ask me three guiding questions to help me write a strong introduction paragraph. Do not write the paragraph for me!' },
+      { id: 'math-1', subject: 'Math', title: 'The Step-by-Step Tutor', shortDesc: 'Get clues and step-by-step guidance on hard problems.', promptText: 'Act as an encouraging middle school math teacher. Do not give me the final answer directly. Help me solve this math problem step-by-step: [Insert Problem]. First, ask me what my first step should be.' },
+      { id: 'science-1', subject: 'Science', title: 'Simple Concept Analogy Maker', shortDesc: 'Translate heavy textbook topics into funny everyday metaphors.', promptText: 'Explain the scientific concept of [Insert Topic, e.g., photosynthesis] to a 7th grader using a fun, everyday analogy. Keep it under 200 words!' }
     ];
 
     function App() {
@@ -323,70 +62,38 @@
       const [selectedSubject, setSelectedSubject] = useState('All');
       const [selectedApp, setSelectedApp] = useState('All');
       const [searchQuery, setSearchQuery] = useState('');
-      
       const [toastMessage, setToastMessage] = useState('');
-      const [toastType, setToastType] = useState('success');
 
       const [sandboxPrompt, setSandboxPrompt] = useState('');
       const [chatMessages, setChatMessages] = useState([
-        { 
-          sender: 'assistant', 
-          text: 'Howdy Bear! 🐾 Welcome to the Grizzly Safe AI Lab. Select any prompt gem from our catalog and hit "Test in Sandbox", or query me below. I am configured with strict school-appropriate, homework-assistance safety filters!' 
-        }
+        { sender: 'assistant', text: 'Howdy Bear! 🐾 Welcome to the Grizzly Safe AI Lab. Type a message below to chat with Sparky!' }
       ]);
       const [userInput, setUserInput] = useState('');
       const [isGenerating, setIsGenerating] = useState(false);
 
-      // DROPDOWN PROMPT BUILDER STATES
       const [builderRole, setBuilderRole] = useState('Math Tutor');
       const [builderTask, setBuilderTask] = useState('help me solve standard math homework problems');
-      const [builderConstraint, setBuilderConstraint] = useState('do not give me the answer directly, instead ask me guiding questions to find it');
-      const [builderTopic, setBuilderTopic] = useState('adding fractions with unlike denominators');
+      const [builderConstraint, setBuilderConstraint] = useState('do not give me the answer directly, instead ask me guiding questions');
       const [builtPrompt, setBuiltPrompt] = useState('');
 
-      const [hasSignedContract, setHasSignedContract] = useState(false);
-      const [studentName, setStudentName] = useState('');
-
-      const chatEndRef = useRef(null);
-
-      // Effect to assemble the multi-step prompt in real-time
       useEffect(() => {
-        const rolePart = builderRole ? `Act as a helpful ${builderRole}. ` : '';
-        const taskPart = builderTask ? `Your task is to ${builderTask} ` : '';
-        const constraintPart = builderConstraint ? `using this constraint: ${builderConstraint}. ` : '';
-        const topicPart = builderTopic ? `Let's work together on: [${builderTopic}].` : '';
-        setBuiltPrompt(`${rolePart}${taskPart}${constraintPart}${topicPart}`);
-      }, [builderRole, builderTask, builderConstraint, builderTopic]);
+        setBuiltPrompt(`Act as a helpful ${builderRole}. Your task is to ${builderTask} using this constraint: ${builderConstraint}.`);
+      }, [builderRole, builderTask, builderConstraint]);
 
-      const showToast = (message, type = 'success') => {
+      const showToast = (message) => {
         setToastMessage(message);
-        setToastType(type);
         setTimeout(() => setToastMessage(''), 3000);
       };
 
       const handleCopyText = (text) => {
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        try {
-          document.execCommand('copy');
-          showToast('Prompt copied! Ready to paste in ClassLink.');
-        } catch (err) {
-          showToast('Could not copy automatically. Please copy manually!', 'error');
-        }
-        document.body.removeChild(textArea);
+        navigator.clipboard.writeText(text);
+        showToast('Prompt copied! Ready to paste.');
       };
-
-      useEffect(() => {
-        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, [chatMessages]);
 
       const handleTryInSandbox = (prompt) => {
         setSandboxPrompt(prompt);
         setUserInput(prompt);
         setActiveTab('sandbox');
-        showToast('Prompt loaded! Replace placeholders in [ ] and hit send.');
       };
 
       const handleSendMessage = async (e) => {
@@ -398,665 +105,96 @@
         setUserInput('');
         setIsGenerating(true);
 
-        const systemPrompt = `
-          You are Sparky, the official Bastrop ISD Grizzly AI Learning Assistant. 
-          Your goals are to help middle schoolers (grades 6, 7, 8) safely learn, brainstorm, and improve.
-          CRITICAL SAFETY DIRECTIVES:
-          1. NEVER write full essays, reports, or homework answers for the student. If they ask you to write a paper or solve a math question directly, you must decline politely and guide them through how to do it themselves instead.
-          2. Keep responses brief, encouraging, and highly accessible to 12-14 year olds. Use bullet points and simple analogies.
-          3. Enforce strict school-appropriate language. Block and politely redirect if the student talks about unsafe elements.
-          Always stay in character as a supportive, warm, but intellectually rigorous peer tutor.
-        `;
+        try {
+          // Pointing directly to our secure Vercel API middleman route!
+          const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: userMsg })
+          });
 
-        // Native Gemini 2.5 Flash implementation utilizing the default system token
-        const apiKey = ""; 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-        const payload = {
-          contents: [{ parts: [{ text: userMsg }] }],
-          systemInstruction: { parts: [{ text: systemPrompt }] }
-        };
-
-        let success = false;
-        let aiResponseText = "";
-
-        // Exponential backoff up to 5 times (1s, 2s, 4s, 8s, 16s)
-        for (let i = 0; i < 5; i++) {
-          try {
-            const response = await fetch(url, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload)
-            });
-
-            if (response.ok) {
-              const responseData = await response.json();
-              aiResponseText = responseData.candidates?.[0]?.content?.parts?.[0]?.text || "I was unable to process that. Please try rephrasing your prompt!";
-              success = true;
-              break;
-            }
-          } catch (err) {
-            // Silence fetch errors for clean sandbox logging
+          if (response.ok) {
+            const data = await response.json();
+            setChatMessages(prev => [...prev, { sender: 'assistant', text: data.reply }]);
+          } else {
+            setChatMessages(prev => [...prev, { sender: 'assistant', text: 'Grizzly Error: Your Vercel backend is online, but your API Key might be missing from the Vercel Dashboard!' }]);
           }
-          await new Promise(res => setTimeout(res, Math.pow(2, i) * 1000));
-        }
-
-        if (success) {
-          setChatMessages(prev => [...prev, { sender: 'assistant', text: aiResponseText }]);
-        } else {
-          setChatMessages(prev => [
-            ...prev, 
-            { 
-              sender: 'assistant', 
-              text: "Grizzly Alert: Connection could not be completed securely. Please verify your internet connection or copy your prompt over to your ClassLink apps directly!" 
-            }
-          ]);
+        } catch (err) {
+          setChatMessages(prev => [...prev, { sender: 'assistant', text: 'Grizzly Error: Could not connect to the Vercel api service.' }]);
         }
         setIsGenerating(false);
       };
 
-      const handleSignContract = (e) => {
-        e.preventDefault();
-        if (!studentName.trim()) {
-          showToast('Please type your name to sign!', 'error');
-          return;
-        }
-        setHasSignedContract(true);
-        showToast('✨ Thank you for committing to safe AI use! Go Grizzlies! 🐻🐾');
-      };
-
-      const filteredGems = PROMPT_GEMS.filter(gem => {
-        const matchesSubject = selectedSubject === 'All' || gem.subject === selectedSubject;
-        const matchesApp = selectedApp === 'All' || gem.appTarget === selectedApp;
-        const matchesSearch = gem.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                              gem.promptText.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                              gem.subject.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchesSubject && matchesApp && matchesSearch;
-      });
-
       return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col selection:bg-rose-200">
-          
-          {/* Simulation Browser Bar */}
-          <div className="bg-slate-900 text-white px-4 py-2 flex items-center justify-between text-xs border-b border-rose-900">
-            <div className="flex items-center space-x-2">
-              <div className="flex space-x-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#6B1426] inline-block"></span>
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block"></span>
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-100 inline-block"></span>
-              </div>
-              <div className="bg-slate-800 text-slate-300 px-3 py-0.5 rounded-md flex items-center space-x-1.5 ml-4 w-72 md:w-96 border border-slate-700">
-                <Icons.Lock size={10} className="text-amber-400" />
-                <span className="truncate select-none font-mono text-slate-300">spark.bisdtx.org/grizzly-ai-spark-portal</span>
-              </div>
-            </div>
-            <div className="text-[#e2c1c6] font-bold tracking-wide hidden md:block">
-              🐾 BASTROP ISD STUDENT AI PORTAL
-            </div>
+        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col">
+          <div className="bg-slate-900 text-white px-4 py-2 flex items-center justify-between text-xs">
+            <span className="font-mono">spark.bisdtx.org/portal</span>
+            <span className="text-[#e2c1c6] font-bold">🐾 BASTROP ISD STUDENT AI ZONE</span>
           </div>
 
-          {/* Main Header with Maroon and Blue Gradient */}
-          <header className="bg-gradient-to-r from-[#6B1426] via-[#4C0E1B] to-[#0B2240] text-white shadow-lg relative overflow-hidden">
-            <div className="absolute right-4 bottom-[-20px] text-white/5 font-extrabold text-9xl select-none pointer-events-none">
-              🐻
-            </div>
-            
-            <div className="max-w-7xl mx-auto px-4 py-6 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-              <div className="flex items-center space-x-3.5">
-                <div className="bg-white text-[#6B1426] p-2.5 rounded-2xl shadow-lg ring-4 ring-[#6B1426]/30 animate-pulse">
-                  <Icons.Sparkles />
-                </div>
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <span className="bg-[#6B1426] text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                      🐻 Grizzly Nation Safe Zone
-                    </span>
-                  </div>
-                  <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-                    BISD <span className="text-white">Grizzly AI Spark</span>
-                  </h1>
-                </div>
-              </div>
-
-              {/* Navigation Tabs */}
-              <div className="flex flex-wrap items-center gap-2 bg-black/30 p-1.5 rounded-xl border border-white/10">
-                <button 
-                  onClick={() => setActiveTab('catalog')} 
-                  className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                    activeTab === 'catalog' ? 'bg-[#6B1426] text-white shadow-md border border-rose-500/20' : 'text-slate-300 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <Icons.Layers />
-                  <span>Prompt Catalog</span>
-                </button>
-                <button 
-                  onClick={() => setActiveTab('sandbox')} 
-                  className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                    activeTab === 'sandbox' ? 'bg-[#6B1426] text-white shadow-md border border-rose-500/20' : 'text-slate-300 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <Icons.Terminal />
-                  <span>Safe Chat Sandbox</span>
-                </button>
-                <button 
-                  onClick={() => setActiveTab('builder')} 
-                  className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                    activeTab === 'builder' ? 'bg-[#6B1426] text-white shadow-md border border-rose-500/20' : 'text-slate-300 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <Icons.Sliders />
-                  <span>Anatomy of a Prompt</span>
-                </button>
-                <button 
-                  onClick={() => setActiveTab('safety')} 
-                  className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                    activeTab === 'safety' ? 'bg-[#6B1426] text-white shadow-md border border-rose-500/20' : 'text-slate-300 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <Icons.Lock size={14} />
-                  <span>Safety Contract</span>
-                  {hasSignedContract && <Icons.CheckCircle2 size={12} className="text-emerald-400 fill-emerald-400 bg-white rounded-full p-0" />}
-                </button>
+          <header className="bg-gradient-to-r from-[#6B1426] to-[#0B2240] text-white shadow-lg py-6 px-4">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+              <h1 className="text-2xl font-extrabold">BISD Grizzly AI Spark</h1>
+              <div className="flex gap-2 bg-black/20 p-1 rounded-xl">
+                <button onClick={() => setActiveTab('catalog')} className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${activeTab === 'catalog' ? 'bg-[#6B1426]' : ''}`}>Catalog</button>
+                <button onClick={() => setActiveTab('sandbox')} className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${activeTab === 'sandbox' ? 'bg-[#6B1426]' : ''}`}>Sandbox Chat</button>
+                <button onClick={() => setActiveTab('builder')} className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${activeTab === 'builder' ? 'bg-[#6B1426]' : ''}`}>Builder</button>
               </div>
             </div>
           </header>
 
-          {/* Main Content Workspace */}
           <main className="flex-grow max-w-7xl mx-auto w-full px-4 py-6">
-
-            {/* Global Alert Notification Banner */}
-            <div className="mb-6 bg-white border-l-4 border-[#6B1426] p-4 rounded-r-xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border border-slate-200">
-              <div className="flex items-start space-x-3">
-                <div className="text-[#6B1426] shrink-0 mt-0.5"><Icons.Info /></div>
-                <p className="text-xs md:text-sm text-slate-700">
-                  <strong className="text-slate-950">Grizzly Pre-Flight Launchpad:</strong> Formulate your prompt goals here, hit copy, then click your ClassLink app to run it with complete security!
-                </p>
-              </div>
-              <a 
-                href="https://launchpad.classlink.com/login" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center space-x-1 bg-[#6B1426] hover:bg-[#4C0E1B] text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow-sm transition-transform hover:-translate-y-0.5 shrink-0"
-              >
-                <span>Launch ClassLink</span>
-                <Icons.ExternalLink />
-              </a>
-            </div>
-
-            {/* ----------------- TAB: CATALOG (SUBJECT GEMS) ----------------- */}
             {activeTab === 'catalog' && (
-              <div>
-                {/* ClassLink Approved Apps Slider Quick Info */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                  <div className="lg:col-span-2 bg-gradient-to-br from-[#0B2240] to-slate-900 text-white rounded-2xl p-6 shadow-md relative overflow-hidden">
-                    <div className="relative z-10">
-                      <span className="bg-[#6B1426] text-white font-bold text-xs uppercase px-2.5 py-1 rounded-full">Spark Lesson</span>
-                      <h2 className="text-xl md:text-2xl font-bold mt-2">ClassLink Approved AI Apps</h2>
-                      <p className="text-slate-300 text-xs md:text-sm mt-2 max-w-xl">
-                        Bastrop ISD provides custom-tailored, safe AI environments directly within your standard ClassLink suite. Click below to see quick tips for each.
-                      </p>
-                      
-                      {/* Horizontal ClassLink Apps strip */}
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
-                        {CLASSLINK_APPS.map(app => (
-                          <div 
-                            key={app.id}
-                            onClick={() => setSelectedApp(selectedApp === app.id ? 'All' : app.id)}
-                            className={`cursor-pointer p-3 rounded-xl border transition-all text-left ${
-                              selectedApp === app.id 
-                                ? 'bg-amber-400 text-blue-950 border-amber-300 scale-[1.02]' 
-                                : 'bg-white/10 text-white border-white/10 hover:bg-white/15'
-                            }`}
-                          >
-                            <span className="text-xs font-bold block truncate">{app.name}</span>
-                            <span className="text-[10px] text-slate-300 hover:text-white block truncate">Click to filter prompts</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Subject Prompt Box Tips */}
-                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {PROMPT_GEMS.map(gem => (
+                  <div key={gem.id} className="bg-white border p-5 rounded-2xl shadow-sm flex flex-col justify-between">
                     <div>
-                      <h3 className="font-bold text-lg text-slate-900 flex items-center space-x-1.5">
-                        <Icons.Star size={18} />
-                        <span>How to use these Gems?</span>
-                      </h3>
-                      <ol className="mt-4 space-y-3 text-xs text-slate-600">
-                        <li className="flex items-start space-x-2">
-                          <span className="bg-blue-100 text-blue-800 font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">1</span>
-                          <span>Pick a subject filter below (Math, ELA, Science, Social Studies).</span>
-                        </li>
-                        <li className="flex items-start space-x-2">
-                          <span className="bg-blue-100 text-blue-800 font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">2</span>
-                          <span>Find a Prompt Gem. Replace placeholder text inside brackets like <code className="bg-slate-100 text-[#6B1426] px-1 py-0.5 rounded font-bold">[Insert Topic]</code>.</span>
-                        </li>
-                        <li className="flex items-start space-x-2">
-                          <span className="bg-blue-100 text-blue-800 font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">3</span>
-                          <span>Copy and paste into your target ClassLink application, or test it live in our Safe Chat Sandbox!</span>
-                        </li>
-                      </ol>
+                      <span className="text-[10px] bg-rose-50 text-[#6B1426] px-2 py-0.5 rounded-full font-bold">{gem.subject}</span>
+                      <h3 className="font-bold text-base mt-2">{gem.title}</h3>
+                      <p className="text-xs text-slate-500 mt-1">{gem.shortDesc}</p>
+                      <div className="bg-slate-50 rounded-xl p-3 my-3 text-xs font-mono text-slate-700">{gem.promptText}</div>
+                    </div>
+                    <div className="flex gap-2 mt-4">
+                      <button onClick={() => handleCopyText(gem.promptText)} className="flex-grow bg-slate-100 font-bold p-2 rounded-xl text-xs">Copy</button>
+                      <button onClick={() => handleTryInSandbox(gem.promptText)} className="flex-grow bg-[#6B1426] text-white font-bold p-2 rounded-xl text-xs">Sandbox</button>
                     </div>
                   </div>
-                </div>
-
-                {/* Subject-Specific Prompt Selection Header */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                  <div className="flex flex-wrap gap-1.5">
-                    {['All', 'ELA', 'Math', 'Science', 'Social Studies', 'Electives'].map(subj => (
-                      <button 
-                        key={subj} 
-                        onClick={() => { setSelectedSubject(subj); setSelectedApp('All'); }} 
-                        className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-                          selectedSubject === subj ? 'bg-[#6B1426] text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                        }`}
-                      >
-                        {subj}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="relative w-full md:w-72">
-                    <span className="absolute left-3 top-2.5 text-slate-400">
-                      <Icons.Search />
-                    </span>
-                    <input 
-                      type="text" 
-                      placeholder="Search safe Grizzly prompts..." 
-                      value={searchQuery} 
-                      onChange={(e) => setSearchQuery(e.target.value)} 
-                      className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#6B1426]" 
-                    />
-                  </div>
-                </div>
-
-                {/* Display active filter badge */}
-                {(selectedSubject !== 'All' || selectedApp !== 'All' || searchQuery) && (
-                  <div className="flex items-center space-x-2 mb-4 text-xs">
-                    <span className="text-slate-500">Active Filters:</span>
-                    {selectedSubject !== 'All' && (
-                      <span className="bg-rose-50 text-[#6B1426] border border-rose-100 font-semibold px-2.5 py-0.5 rounded-full flex items-center space-x-1">
-                        <span>Subject: {selectedSubject}</span>
-                        <button onClick={() => setSelectedSubject('All')} className="font-bold hover:text-red-500 ml-1">×</button>
-                      </span>
-                    )}
-                    {selectedApp !== 'All' && (
-                      <span className="bg-purple-100 text-purple-800 font-semibold px-2.5 py-0.5 rounded-full flex items-center space-x-1">
-                        <span>App: {CLASSLINK_APPS.find(a => a.id === selectedApp)?.name}</span>
-                        <button onClick={() => setSelectedApp('All')} className="font-bold hover:text-red-500 ml-1">×</button>
-                      </span>
-                    )}
-                    {searchQuery && (
-                      <span className="bg-amber-100 text-amber-800 font-semibold px-2.5 py-0.5 rounded-full flex items-center space-x-1">
-                        <span>Search: "{searchQuery}"</span>
-                        <button onClick={() => setSearchQuery('')} className="font-bold hover:text-red-500 ml-1">×</button>
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                {/* Grid of Subject Specific Gems */}
-                {filteredGems.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredGems.map(gem => {
-                      const subjColors = {
-                        'ELA': { bg: 'bg-indigo-50 border-indigo-100', text: 'text-indigo-800', dot: 'bg-indigo-600' },
-                        'Math': { bg: 'bg-orange-50 border-orange-100', text: 'text-orange-800', dot: 'bg-orange-600' },
-                        'Science': { bg: 'bg-teal-50 border-teal-100', text: 'text-teal-800', dot: 'bg-teal-600' },
-                        'Social Studies': { bg: 'bg-emerald-50 border-emerald-100', text: 'text-emerald-800', dot: 'bg-emerald-600' },
-                        'Electives': { bg: 'bg-purple-50 border-purple-100', text: 'text-purple-800', dot: 'bg-purple-600' }
-                      };
-                      const colorConfig = subjColors[gem.subject] || { bg: 'bg-slate-50', text: 'text-slate-800', dot: 'bg-slate-600' };
-                      const targetAppObj = CLASSLINK_APPS.find(app => app.id === gem.appTarget);
-
-                      return (
-                        <div key={gem.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
-                          <div>
-                            <div className="flex justify-between items-center mb-2">
-                              <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${colorConfig.bg} ${colorConfig.text} border`}>
-                                {gem.subject} Prompt Gem
-                              </span>
-                              {targetAppObj && (
-                                <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
-                                  Use in: {targetAppObj.name}
-                                </span>
-                              )}
-                            </div>
-                            <h3 className="font-bold text-base text-slate-900 group-hover:text-[#6B1426] transition-colors">{gem.title}</h3>
-                            <p className="text-xs text-slate-500 mt-1">{gem.shortDesc}</p>
-                            
-                            {/* Objective Block */}
-                            <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 my-3 text-[11px] text-slate-600 flex items-start space-x-2">
-                              <Icons.CheckCircle2 size={14} className="text-slate-400 shrink-0 mt-0.5" />
-                              <div>
-                                <span className="font-bold text-slate-800">Learning Goal:</span> {gem.objective}
-                              </div>
-                            </div>
-
-                            <div className="bg-slate-50/85 rounded-xl p-3 my-3 text-xs font-mono select-all border border-slate-100 text-slate-700 max-h-32 overflow-y-auto leading-relaxed">
-                              {gem.promptText}
-                            </div>
-                          </div>
-                          <div className="mt-4 flex gap-2 pt-2 border-t border-slate-100">
-                            <button 
-                              onClick={() => handleCopyText(gem.promptText)} 
-                              className="flex-grow bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold p-2 rounded-xl text-xs transition-colors"
-                            >
-                              Copy
-                            </button>
-                            <button 
-                              onClick={() => handleTryInSandbox(gem.promptText)} 
-                              className="flex-grow bg-[#6B1426] hover:bg-[#4C0E1B] text-white font-bold p-2 rounded-xl text-xs transition-colors"
-                            >
-                              Test in Sandbox
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm max-w-lg mx-auto my-12">
-                    <Icons.AlertCircle size={48} className="text-amber-500 mx-auto mb-4" />
-                    <h3 className="text-lg font-bold text-slate-900">No matching Prompt Gems found</h3>
-                    <p className="text-slate-500 text-xs mt-2">
-                      Try clearing your filters or testing out our custom prompt builder to build your own from scratch!
-                    </p>
-                    <div className="mt-6 flex justify-center space-x-3">
-                      <button 
-                        onClick={() => { setSelectedSubject('All'); setSelectedApp('All'); setSearchQuery(''); }}
-                        className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-4 py-2 rounded-xl text-xs"
-                      >
-                        Reset Filters
-                      </button>
-                      <button 
-                        onClick={() => setActiveTab('builder')}
-                        className="bg-amber-400 hover:bg-amber-500 text-blue-950 font-bold px-4 py-2 rounded-xl text-xs"
-                      >
-                        Build Custom Prompt
-                      </button>
-                    </div>
-                  </div>
-                )}
+                ))}
               </div>
             )}
 
-            {/* ----------------- TAB: LIVE SANDBOX CHAT ----------------- */}
             {activeTab === 'sandbox' && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                {/* Left Sandbox Column: Grizzly Safe Monitoring Guidelines */}
-                <div className="lg:col-span-1 space-y-4">
-                  <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm border-t-4 border-t-[#6B1426]">
-                    <h2 className="font-bold text-sm text-[#0B2240] flex items-center space-x-1.5 uppercase tracking-wide">
-                      <Icons.ShieldAlert size={16} className="text-[#6B1426]" />
-                      <span>Grizzly GenAI Safe Monitor</span>
-                    </h2>
-                    <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
-                      This playground aligns directly with Bastrop ISD's classroom monitoring guidelines. Remember the code of conduct:
-                    </p>
-                    <ul className="mt-3 space-y-2 text-[11px] text-slate-600 border-t border-slate-100 pt-3">
-                      <li className="flex items-start space-x-2">
-                        <span className="text-emerald-600 font-bold">✔</span>
-                        <span><strong>Vetted Tools Only:</strong> Use approved school tools launched from ClassLink.</span>
-                      </li>
-                      <li className="flex items-start space-x-2">
-                        <span className="text-emerald-600 font-bold">✔</span>
-                        <span><strong>Data Protection:</strong> Never input private student details or school passwords.</span>
-                      </li>
-                      <li className="flex items-start space-x-2">
-                        <span className="text-emerald-600 font-bold">✔</span>
-                        <span><strong>Academic Integrity:</strong> Use AI to brainstorm, structure, or adapt, never to write the assignment for you.</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-
-                {/* Right Sandbox Column: Safe Live Chat Sandbox */}
-                <div className="lg:col-span-2 flex flex-col bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden min-h-[440px] border-b-4 border-b-[#0B2240]">
-                  <div className="bg-[#6B1426] text-white px-5 py-4 flex justify-between items-center">
-                    <div className="flex items-center space-x-2">
-                      <span>🐾</span>
-                      <h3 className="font-bold text-sm">Grizzly Safe Prompt Playground</h3>
+              <div className="max-w-3xl mx-auto flex flex-col bg-white border rounded-2xl shadow-sm h-[450px]">
+                <div className="bg-[#6B1426] text-white px-4 py-3 font-bold text-sm">Sparky Personal Learning Sandbox 🐻</div>
+                <div className="flex-grow p-4 space-y-4 overflow-y-auto bg-slate-50/50">
+                  {chatMessages.map((msg, index) => (
+                    <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[80%] rounded-xl p-3 text-xs ${msg.sender === 'user' ? 'bg-[#0B2240] text-white' : 'bg-white border text-slate-800'}`}>
+                        {msg.text}
+                      </div>
                     </div>
-                    <span className="text-[9px] uppercase font-semibold px-2 py-0.5 rounded bg-[#0B2240] text-[#e2c1c6] tracking-wider animate-pulse">
-                      Live Secure Chat Enabled
-                    </span>
-                  </div>
-
-                  {/* Messages Board */}
-                  <div className="flex-grow p-4 space-y-4 overflow-y-auto max-h-[320px] bg-slate-50/40">
-                    {chatMessages.map((msg, index) => (
-                      <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[85%] rounded-2xl p-3.5 text-xs ${
-                          msg.sender === 'user' 
-                            ? 'bg-[#0B2240] text-white rounded-tr-none shadow-sm' 
-                            : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none shadow-sm leading-relaxed'
-                        }`}>
-                          <div className="font-bold text-[9px] mb-1 text-slate-400 uppercase tracking-widest">
-                            {msg.sender === 'user' ? "My Prompt Workspace" : "Grizzly Sparky Counselor"}
-                          </div>
-                          <div>{msg.text}</div>
-                        </div>
-                      </div>
-                    ))}
-                    {isGenerating && (
-                      <div className="flex justify-start">
-                        <div className="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-3.5 text-xs text-slate-500 animate-pulse">
-                          🐾 Grizzly Assistant is analyzing your parameters...
-                        </div>
-                      </div>
-                    )}
-                    <div ref={chatEndRef}></div>
-                  </div>
-
-                  {/* Input Form with Sandbox clear option */}
-                  <form onSubmit={handleSendMessage} className="p-4 border-t border-slate-200 bg-white">
-                    {sandboxPrompt && (
-                      <div className="mb-2 bg-rose-50 border border-rose-100 rounded-lg p-2 flex items-center justify-between text-[11px] text-[#6B1426]">
-                        <span className="truncate font-medium">Prompt Draft Loaded: <strong>"{sandboxPrompt.substring(0, 40)}..."</strong></span>
-                        <button type="button" onClick={() => setSandboxPrompt('')} className="font-bold text-rose-900 hover:underline">Clear Template</button>
-                      </div>
-                    )}
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={userInput}
-                        onChange={(e) => setUserInput(e.target.value)}
-                        placeholder="Alter the bracket elements above, or test standard homework ideas..."
-                        className="flex-grow bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#6B1426]"
-                      />
-                      <button type="submit" className="bg-[#6B1426] hover:bg-[#4C0E1B] text-white p-3 rounded-xl transition-colors"><Icons.Send /></button>
-                    </div>
-                  </form>
+                  ))}
+                  {isGenerating && <div className="text-xs text-slate-400 animate-pulse">🐾 Sparky is running safety filters...</div>}
                 </div>
-
+                <form onSubmit={handleSendMessage} className="p-3 border-t bg-white flex gap-2">
+                  <input type="text" value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder="Type or adjust your prompt..." className="flex-grow bg-slate-50 border rounded-xl p-2.5 text-xs outline-none" />
+                  <button type="submit" className="bg-[#6B1426] text-white px-4 rounded-xl text-xs font-bold">Send</button>
+                </form>
               </div>
             )}
 
-            {/* ----------------- TAB: CUSTOM PROMPT BUILDER ----------------- */}
             {activeTab === 'builder' && (
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm max-w-4xl mx-auto">
-                <div className="border-b border-slate-100 pb-4 mb-6">
-                  <h2 className="text-xl font-bold text-[#0B2240] flex items-center gap-1.5 mb-1">
-                    <Icons.Sliders />
-                    <span>Anatomy of a Prompt Builder: Grizzly Student Edition</span>
-                  </h2>
-                  <p className="text-xs text-slate-500">The best way to get safe, useful answers from AI is to construct your prompt carefully using four building blocks.</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  
-                  {/* Build Stage Controls */}
-                  <div className="space-y-4">
-                    <h3 className="font-bold text-sm text-[#6B1426] uppercase tracking-wider mb-2">Step 1: Fill in the Prompt Blocks</h3>
-
-                    {/* Block 1: Role */}
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">👑 1. The Role (Who is the AI pretending to be?)</label>
-                      <select 
-                        value={builderRole}
-                        onChange={(e) => setBuilderRole(e.target.value)}
-                        className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-[#6B1426]"
-                      >
-                        <option value="Math Tutor">Encouraging Middle School Math Tutor</option>
-                        <option value="Writing Coach">Friendly Paragraph Writing Coach</option>
-                        <option value="Science Guide">Excited Science Analogy Maker</option>
-                        <option value="History Guide">Living History Guide from the 1800s</option>
-                        <option value="Art Assistant">Creative Art Brainstormer</option>
-                      </select>
-                    </div>
-
-                    {/* Block 2: Task */}
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">🎯 2. The Task (What do you want it to do?)</label>
-                      <input 
-                        type="text"
-                        value={builderTask}
-                        onChange={(e) => setBuilderTask(e.target.value)}
-                        placeholder="e.g. help me plan my science experiment steps"
-                        className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-[#6B1426]"
-                      />
-                    </div>
-
-                    {/* Block 3: Constraint */}
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">🛡️ 3. The Constraint (How should the AI behave safely?)</label>
-                      <select 
-                        value={builderConstraint}
-                        onChange={(e) => setBuilderConstraint(e.target.value)}
-                        className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-[#6B1426]"
-                      >
-                        <option value="do not give me the answer directly, instead ask me guiding questions to find it">Socratic Mode (Ask questions, don't give direct answers)</option>
-                        <option value="keep vocabulary easy and use a funny metaphor or story to explain">Simplified Mode (Explain with basic terms and funny analogies)</option>
-                        <option value="make bullet points and keep your total response under 100 words">Brief Outline (Very short responses in bullets)</option>
-                        <option value="suggest 3 options and ask me to choose my favorite">Choice Board (Present options and let me select)</option>
-                      </select>
-                    </div>
-
-                    {/* Block 4: Topic */}
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">📖 4. The Topic (Your exact homework / subject concept)</label>
-                      <input 
-                        type="text"
-                        value={builderTopic}
-                        onChange={(e) => setBuilderTopic(e.target.value)}
-                        placeholder="e.g. why cells divide"
-                        className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-[#6B1426]"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Real-time Built Output with Grizzly design details */}
-                  <div className="bg-[#0B2240] text-white rounded-2xl p-5 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between mb-3.5">
-                        <span className="text-[#e2c1c6] font-bold text-xs uppercase tracking-widest block">🔮 Live Prompt Blueprint</span>
-                        <span className="bg-[#6B1426] text-white text-[10px] px-2 py-0.5 rounded">Autocreated</span>
-                      </div>
-
-                      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-300 break-words leading-relaxed min-h-[140px]">
-                        {builtPrompt}
-                      </div>
-
-                      <div className="mt-4 space-y-2 text-xs text-slate-300">
-                        <p className="flex items-center space-x-1.5">
-                          <span className="w-2 h-2 rounded-full bg-[#6B1426] inline-block"></span>
-                          <span>Role: <strong className="text-white">{builderRole}</strong></span>
-                        </p>
-                        <p className="flex items-center space-x-1.5">
-                          <span className="w-2 h-2 rounded-full bg-[#e2c1c6] inline-block"></span>
-                          <span>Task: <strong className="text-white">"{builderTask}"</strong></span>
-                        </p>
-                        <p className="flex items-center space-x-1.5">
-                          <span className="w-2 h-2 rounded-full bg-teal-500 inline-block"></span>
-                          <span>Safety Guard: <strong className="text-white">"{builderConstraint.substring(0, 30)}..."</strong></span>
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Prompt Builder CTA Buttons */}
-                    <div className="mt-6 pt-4 border-t border-slate-800 grid grid-cols-2 gap-3">
-                      <button 
-                        onClick={() => handleCopyText(builtPrompt)}
-                        className="bg-white/10 hover:bg-white/15 text-white font-bold p-2.5 rounded-xl text-xs transition-colors flex items-center justify-center space-x-1"
-                      >
-                        <Icons.Copy size={13} />
-                        <span>Copy Built Prompt</span>
-                      </button>
-                      <button 
-                        onClick={() => handleTryInSandbox(builtPrompt)}
-                        className="bg-[#6B1426] hover:bg-[#4C0E1B] text-white font-bold p-2.5 rounded-xl text-xs transition-transform hover:-translate-y-0.5 flex items-center justify-center space-x-1 shadow-md"
-                      >
-                        <Icons.Terminal size={13} />
-                        <span>Try in Sandbox</span>
-                      </button>
-                    </div>
-                  </div>
-
-                </div>
+              <div className="bg-white border rounded-2xl p-6 max-w-xl mx-auto space-y-4">
+                <h2 className="text-base font-bold text-[#0B2240]">Custom Blueprint Builder</h2>
+                <input type="text" value={builderRole} onChange={(e) => setBuilderRole(e.target.value)} className="w-full text-xs bg-slate-50 border p-2.5 rounded-xl" placeholder="Role" />
+                <input type="text" value={builderTask} onChange={(e) => setBuilderTask(e.target.value)} className="w-full text-xs bg-slate-50 border p-2.5 rounded-xl" placeholder="Task" />
+                <div className="bg-[#0B2240] text-white p-4 rounded-xl font-mono text-xs">{builtPrompt}</div>
+                <button onClick={() => handleTryInSandbox(builtPrompt)} className="w-full bg-[#6B1426] text-white p-2.5 rounded-xl font-bold text-xs">Move to Sandbox</button>
               </div>
             )}
-
-            {/* ----------------- TAB: SAFETY CONTRACT ----------------- */}
-            {activeTab === 'safety' && (
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm max-w-md mx-auto text-center">
-                <span className="text-[#6B1426] mx-auto block mb-2"><Icons.Lock size={32} /></span>
-                <h2 className="text-lg font-bold text-[#0B2240]">Bastrop ISD Safe AI Use Pledge</h2>
-                <p className="text-xs text-slate-600 mt-2 leading-relaxed font-medium">
-                  I pledge to use district AI resources to spark ideas and optimize learning, keeping private data safe and citing assistance transparently. Go Grizzlies!
-                </p>
-                <input 
-                  type="text" 
-                  placeholder="Type Your Name to Sign" 
-                  value={studentName} 
-                  onChange={(e) => setStudentName(e.target.value)} 
-                  className="w-full text-xs border border-slate-200 rounded-xl p-2.5 mt-4 text-center shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6B1426]" 
-                />
-                <button 
-                  onClick={() => setHasSignedContract(true)} 
-                  className="w-full bg-[#6B1426] hover:bg-[#4C0E1B] text-white font-bold p-2.5 rounded-xl text-xs mt-3 transition-all shadow-md"
-                >
-                  Submit Digital Oath 🐾
-                </button>
-              </div>
-            )}
-
           </main>
 
-          {/* Footer with deep blue background */}
-          <footer className="bg-[#0B2240] text-slate-400 py-8 border-t border-slate-800">
-            <div className="max-w-7xl mx-auto px-4 text-center space-y-4">
-              <p className="text-xs">
-                © 2026 Bastrop ISD Educational Technology Services. This is an official Grizzly Bear learning sandbox built in accordance with Texas Education Agency guidance.
-              </p>
-              <div className="flex justify-center space-x-6 text-xs font-semibold">
-                <a href="https://launchpad.classlink.com/login" target="_blank" rel="noopener noreferrer" className="hover:text-white">
-                  BISD ClassLink
-                </a>
-                <span className="text-slate-700">|</span>
-                <button onClick={() => setActiveTab('safety')} className="hover:text-white">
-                  Responsible AI Policy
-                </button>
-                <span className="text-slate-700">|</span>
-                <a href="https://www.bisdtx.org" target="_blank" rel="noopener noreferrer" className="hover:text-white">
-                  Bastrop ISD Home
-                </a>
-              </div>
-            </div>
-          </footer>
-
-          {/* Interactive Toast Notification */}
-          {toastMessage && (
-            <div className="fixed bottom-6 right-6 z-50 bg-[#0B2240] text-white text-xs font-bold px-4 py-3 rounded-xl shadow-xl border border-slate-800 flex items-center space-x-2 animate-bounce">
-              {toastType === 'success' ? (
-                <Icons.Check />
-              ) : (
-                <Icons.AlertCircle size={16} />
-              )}
-              <span>{toastMessage}</span>
-            </div>
-          )}
-
+          {toastMessage && <div className="fixed bottom-4 right-4 bg-[#0B2240] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg">{toastMessage}</div>}
         </div>
       );
     }
