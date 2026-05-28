@@ -6,13 +6,18 @@
   <title>BISD Grizzly AI Spark Student Portal</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
+  
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
@@ -22,34 +27,57 @@
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
+    // SVG Icons Map
     const Icons = {
-      Sparkles: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/><path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5Z"/><path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1Z"/></svg>),
-      BookOpen: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>),
-      Binary: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="12" x="2" y="6" rx="1"/><rect width="8" height="12" x="14" y="6" rx="1"/><path d="M6 10h.01"/><path d="M18 10h.01"/></svg>),
-      Compass: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>),
-      Atom: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12a15.3 15.3 0 0 1 10-4 15.3 15.3 0 0 1 10 4 15.3 15.3 0 0 1-10 4 15.3 15.3 0 0 1-10-4z"/></svg>),
-      Palette: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.7255 3.09032 17.1962 4.85857 19C5.03453 19.176 5.12251 19.264 5.15875 19.3514C5.19499 19.4388 5.17643 19.5494 5.13931 19.7706L5.05194 20.2913C4.95475 20.8711 5.39955 21.3912 5.98739 21.3117L6.68537 21.2172C6.91404 21.1862 7.02838 21.1707 7.13524 21.2001C7.2421 21.2295 7.33408 21.3019 7.51804 21.4468C8.79093 21.8016 10.3341 22 12 22Z"/><circle cx="7.5" cy="10.5" r="1.5"/><circle cx="11.5" cy="7.5" r="1.5"/><circle cx="16.5" cy="9.5" r="1.5"/></svg>),
-      Search: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>),
-      Copy: ({ size = 16 }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>),
-      Check: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>),
-      Send: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>),
-      ShieldAlert: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>),
-      Info: () => (<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>),
-      ExternalLink: () => (<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>),
-      Lock: ({ size = 14 }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>),
-      Layers: () => (<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polygon points="2 17 12 22 22 17"/><polygon points="2 12 12 17 22 12"/></svg>),
-      Terminal: ({ size = 14 }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>),
-      Sliders: ({ size = 14 }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" h1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="2" x2="6" y1="14" y2="14"/><line x1="10" x2="14" y1="8" y2="8"/><line x1="18" x2="22" y1="16" y2="16"/></svg>)
+      Sparkles: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/><path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5Z"/><path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1Z"/></svg>
+      ),
+      BookOpen: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      ),
+      Binary: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="12" x="2" y="6" rx="1"/><rect width="8" height="12" x="14" y="6" rx="1"/><path d="M6 10h.01"/><path d="M18 10h.01"/></svg>
+      ),
+      Compass: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+      ),
+      Atom: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12a15.3 15.3 0 0 1 10-4 15.3 15.3 0 0 1 10 4 15.3 15.3 0 0 1-10 4 15.3 15.3 0 0 1-10-4z"/></svg>
+      ),
+      Palette: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.7255 3.09032 17.1962 4.85857 19C5.03453 19.176 5.12251 19.264 5.15875 19.3514C5.19499 19.4388 5.17643 19.5494 5.13931 19.7706L5.05194 20.2913C4.95475 20.8711 5.39955 21.3912 5.98739 21.3117L6.68537 21.2172C6.91404 21.1862 7.02838 21.1707 7.13524 21.2001C7.2421 21.2295 7.33408 21.3019 7.51804 21.4468C8.79093 21.8016 10.3341 22 12 22Z"/><circle cx="7.5" cy="10.5" r="1.5"/><circle cx="11.5" cy="7.5" r="1.5"/><circle cx="16.5" cy="9.5" r="1.5"/></svg>
+      ),
+      Search: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      ),
+      Copy: ({ size = 16 }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+      ),
+      Check: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      ),
+      Send: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+      ),
+      ShieldAlert: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+      ),
+      Key: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3M17 6l3 3"/></svg>
+      ),
+      Lock: ({ size = 14 }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      ),
+      Layers: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polygon points="2 17 12 22 22 17"/><polygon points="2 12 12 17 22 12"/></svg>
+      ),
+      Terminal: ({ size = 14 }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
+      ),
+      Sliders: ({ size = 14 }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" h1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="2" x2="6" y1="14" y2="14"/><line x1="10" x2="14" y1="8" y2="8"/><line x1="18" x2="22" y1="16" y2="16"/></svg>
+      )
     };
-
-    const CLASSLINK_APPS = [
-      { id: 'canva', name: 'Canva for Education' },
-      { id: 'google', name: 'Google Docs / Drive' },
-      { id: 'adobe', name: 'Adobe Express' },
-      { id: 'schoolai', name: 'SchoolAI Spaces' },
-      { id: 'snorkl', name: 'Snorkl AI' },
-      { id: 'magicschool', name: 'MagicSchool AI (Student)' }
-    ];
 
     const PROMPT_GEMS = [
       { id: 'ela-1', subject: 'ELA', title: 'The Paragraph Drafting Coach', shortDesc: 'Brainstorm an introduction with 3 helpful questions.', promptText: 'Act as a friendly middle school writing coach. I will give you my main idea for an essay about [Insert Topic], and you will ask me three guiding questions to help me write a strong introduction paragraph. Do not write the paragraph for me!' },
@@ -59,14 +87,11 @@
 
     function App() {
       const [activeTab, setActiveTab] = useState('catalog'); 
-      const [selectedSubject, setSelectedSubject] = useState('All');
-      const [selectedApp, setSelectedApp] = useState('All');
-      const [searchQuery, setSearchQuery] = useState('');
       const [toastMessage, setToastMessage] = useState('');
+      const [customApiKey, setCustomApiKey] = useState('');
 
-      const [sandboxPrompt, setSandboxPrompt] = useState('');
       const [chatMessages, setChatMessages] = useState([
-        { sender: 'assistant', text: 'Howdy Bear! 🐾 Welcome to the Grizzly Safe AI Lab. Type a message below to chat with Sparky!' }
+        { sender: 'assistant', text: 'Howdy Bear! 🐾 Welcome back to the Grizzly Lab. If you have an API key, you can open the config box below to test live prompts. Otherwise, feel free to build templates and copy them over to your ClassLink apps!' }
       ]);
       const [userInput, setUserInput] = useState('');
       const [isGenerating, setIsGenerating] = useState(false);
@@ -86,12 +111,16 @@
       };
 
       const handleCopyText = (text) => {
-        navigator.clipboard.writeText(text);
-        showToast('Prompt copied! Ready to paste.');
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showToast('Prompt copied! Ready to paste in ClassLink.');
       };
 
       const handleTryInSandbox = (prompt) => {
-        setSandboxPrompt(prompt);
         setUserInput(prompt);
         setActiveTab('sandbox');
       };
@@ -105,22 +134,34 @@
         setUserInput('');
         setIsGenerating(true);
 
-        try {
-          // Pointing directly to our secure Vercel API middleman route!
-          const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: userMsg })
-          });
+        const systemPrompt = "You are Sparky, the official Bastrop ISD Grizzly AI Learning Assistant. Guide middle schoolers safely without giving away direct answers.";
+        const apiKey = customApiKey.trim();
 
-          if (response.ok) {
-            const data = await response.json();
-            setChatMessages(prev => [...prev, { sender: 'assistant', text: data.reply }]);
-          } else {
-            setChatMessages(prev => [...prev, { sender: 'assistant', text: 'Grizzly Error: Your Vercel backend is online, but your API Key might be missing from the Vercel Dashboard!' }]);
+        if (!apiKey) {
+          await new Promise(res => setTimeout(res, 800));
+          setChatMessages(prev => [...prev, { sender: 'assistant', text: "Grizzly Alert: Connection could not be completed securely. Please verify your internet connection or copy your prompt over to your ClassLink apps directly! (To run a live test here, paste an API Key into the settings box below)." }]);
+        } else {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+          try {
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: userMsg }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+              })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+              setChatMessages(prev => [...prev, { sender: 'assistant', text: replyText }]);
+            } else {
+              setChatMessages(prev => [...prev, { sender: 'assistant', text: "Grizzly Alert: Connection could not be completed securely. Please check that your API key is correct." }]);
+            }
+          } catch (err) {
+            setChatMessages(prev => [...prev, { sender: 'assistant', text: "Grizzly Alert: network error encountered while reaching out to live servers." }]);
           }
-        } catch (err) {
-          setChatMessages(prev => [...prev, { sender: 'assistant', text: 'Grizzly Error: Could not connect to the Vercel api service.' }]);
         }
         setIsGenerating(false);
       };
@@ -128,35 +169,41 @@
       return (
         <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col">
           <div className="bg-slate-900 text-white px-4 py-2 flex items-center justify-between text-xs">
-            <span className="font-mono">spark.bisdtx.org/portal</span>
-            <span className="text-[#e2c1c6] font-bold">🐾 BASTROP ISD STUDENT AI ZONE</span>
+            <div className="flex items-center space-x-2">
+              <Icons.Lock size={10} className="text-amber-400" />
+              <span className="font-mono">spark.bisdtx.org/grizzly-ai-spark-portal</span>
+            </div>
+            <span className="text-[#e2c1c6] font-bold">🐾 BASTROP ISD STUDENT PORTAL</span>
           </div>
 
-          <header className="bg-gradient-to-r from-[#6B1426] to-[#0B2240] text-white shadow-lg py-6 px-4">
+          <header className="bg-gradient-to-r from-[#6B1426] via-[#4C0E1B] to-[#0B2240] text-white shadow-lg py-6 px-4">
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-              <h1 className="text-2xl font-extrabold">BISD Grizzly AI Spark</h1>
-              <div className="flex gap-2 bg-black/20 p-1 rounded-xl">
-                <button onClick={() => setActiveTab('catalog')} className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${activeTab === 'catalog' ? 'bg-[#6B1426]' : ''}`}>Catalog</button>
-                <button onClick={() => setActiveTab('sandbox')} className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${activeTab === 'sandbox' ? 'bg-[#6B1426]' : ''}`}>Sandbox Chat</button>
-                <button onClick={() => setActiveTab('builder')} className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${activeTab === 'builder' ? 'bg-[#6B1426]' : ''}`}>Builder</button>
+              <div className="flex items-center space-x-3">
+                <div className="bg-white text-[#6B1426] p-2 rounded-xl"><Icons.Sparkles /></div>
+                <h1 className="text-2xl font-extrabold tracking-tight">BISD Grizzly AI Spark</h1>
+              </div>
+              <div className="flex gap-2 bg-black/30 p-1.5 rounded-xl border border-white/10">
+                <button onClick={() => setActiveTab('catalog')} className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${activeTab === 'catalog' ? 'bg-[#6B1426] text-white' : 'text-slate-300'}`}><Icons.Layers className="inline mr-1" />Catalog</button>
+                <button onClick={() => setActiveTab('sandbox')} className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${activeTab === 'sandbox' ? 'bg-[#6B1426] text-white' : 'text-slate-300'}`}><Icons.Terminal className="inline mr-1" />Sandbox Chat</button>
+                <button onClick={() => setActiveTab('builder')} className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${activeTab === 'builder' ? 'bg-[#6B1426] text-white' : 'text-slate-300'}`}><Icons.Sliders className="inline mr-1" />Builder</button>
               </div>
             </div>
           </header>
 
           <main className="flex-grow max-w-7xl mx-auto w-full px-4 py-6">
             {activeTab === 'catalog' && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {PROMPT_GEMS.map(gem => (
-                  <div key={gem.id} className="bg-white border p-5 rounded-2xl shadow-sm flex flex-col justify-between">
+                  <div key={gem.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
                     <div>
-                      <span className="text-[10px] bg-rose-50 text-[#6B1426] px-2 py-0.5 rounded-full font-bold">{gem.subject}</span>
+                      <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-rose-50 text-[#6B1426] border">{gem.subject}</span>
                       <h3 className="font-bold text-base mt-2">{gem.title}</h3>
                       <p className="text-xs text-slate-500 mt-1">{gem.shortDesc}</p>
-                      <div className="bg-slate-50 rounded-xl p-3 my-3 text-xs font-mono text-slate-700">{gem.promptText}</div>
+                      <div className="bg-slate-50 rounded-xl p-3 my-3 text-xs font-mono text-slate-700 max-h-24 overflow-y-auto">{gem.promptText}</div>
                     </div>
                     <div className="flex gap-2 mt-4">
                       <button onClick={() => handleCopyText(gem.promptText)} className="flex-grow bg-slate-100 font-bold p-2 rounded-xl text-xs">Copy</button>
-                      <button onClick={() => handleTryInSandbox(gem.promptText)} className="flex-grow bg-[#6B1426] text-white font-bold p-2 rounded-xl text-xs">Sandbox</button>
+                      <button onClick={() => handleTryInSandbox(gem.promptText)} className="flex-grow bg-[#6B1426] text-white font-bold p-2 rounded-xl text-xs">Test</button>
                     </div>
                   </div>
                 ))}
@@ -164,32 +211,56 @@
             )}
 
             {activeTab === 'sandbox' && (
-              <div className="max-w-3xl mx-auto flex flex-col bg-white border rounded-2xl shadow-sm h-[450px]">
-                <div className="bg-[#6B1426] text-white px-4 py-3 font-bold text-sm">Sparky Personal Learning Sandbox 🐻</div>
-                <div className="flex-grow p-4 space-y-4 overflow-y-auto bg-slate-50/50">
+              <div className="max-w-2xl mx-auto flex flex-col bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden h-[480px]">
+                <div className="bg-[#6B1426] text-white px-5 py-4 flex justify-between items-center">
+                  <h3 className="font-bold text-sm">Grizzly Safe Playground 🐻</h3>
+                </div>
+
+                <div className="flex-grow p-4 space-y-4 overflow-y-auto bg-slate-50/40">
                   {chatMessages.map((msg, index) => (
                     <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[80%] rounded-xl p-3 text-xs ${msg.sender === 'user' ? 'bg-[#0B2240] text-white' : 'bg-white border text-slate-800'}`}>
+                      <div className={`max-w-[85%] rounded-2xl p-3.5 text-xs ${msg.sender === 'user' ? 'bg-[#0B2240] text-white' : 'bg-white border border-slate-200 text-slate-800'}`}>
                         {msg.text}
                       </div>
                     </div>
                   ))}
-                  {isGenerating && <div className="text-xs text-slate-400 animate-pulse">🐾 Sparky is running safety filters...</div>}
+                  {isGenerating && <div className="text-xs text-slate-400 animate-pulse">🐾 Sparky is thinking...</div>}
                 </div>
-                <form onSubmit={handleSendMessage} className="p-3 border-t bg-white flex gap-2">
-                  <input type="text" value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder="Type or adjust your prompt..." className="flex-grow bg-slate-50 border rounded-xl p-2.5 text-xs outline-none" />
+
+                {/* Secure, Discrete Key Input Tool built at bottom of frame */}
+                <div className="px-4 py-2 bg-slate-100/80 border-t border-slate-200 flex items-center justify-between gap-4">
+                  <div className="flex items-center space-x-1.5 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                    <Icons.Key /> <span>Admin Testing Key:</span>
+                  </div>
+                  <input 
+                    type="password" 
+                    placeholder="Paste AI Studio Key here to test live connections..." 
+                    value={customApiKey}
+                    onChange={(e) => setCustomApiKey(e.target.value)}
+                    className="flex-grow max-w-xs text-[11px] bg-white border border-slate-300 rounded-lg px-2.5 py-1 outline-none font-mono"
+                  />
+                </div>
+
+                <form onSubmit={handleSendMessage} className="p-4 border-t border-slate-200 bg-white flex gap-2">
+                  <input type="text" value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder="Type a message or load a template..." className="flex-grow bg-slate-50 border rounded-xl p-3 text-xs outline-none" />
                   <button type="submit" className="bg-[#6B1426] text-white px-4 rounded-xl text-xs font-bold">Send</button>
                 </form>
               </div>
             )}
 
             {activeTab === 'builder' && (
-              <div className="bg-white border rounded-2xl p-6 max-w-xl mx-auto space-y-4">
-                <h2 className="text-base font-bold text-[#0B2240]">Custom Blueprint Builder</h2>
-                <input type="text" value={builderRole} onChange={(e) => setBuilderRole(e.target.value)} className="w-full text-xs bg-slate-50 border p-2.5 rounded-xl" placeholder="Role" />
-                <input type="text" value={builderTask} onChange={(e) => setBuilderTask(e.target.value)} className="w-full text-xs bg-slate-50 border p-2.5 rounded-xl" placeholder="Task" />
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm max-w-xl mx-auto space-y-4">
+                <h2 className="text-base font-bold text-[#0B2240]">Custom Prompt Blueprint Builder</h2>
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">Role</label>
+                  <input type="text" value={builderRole} onChange={(e) => setBuilderRole(e.target.value)} className="w-full text-xs bg-slate-50 border p-2.5 rounded-xl" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">Task</label>
+                  <input type="text" value={builderTask} onChange={(e) => setBuilderTask(e.target.value)} className="w-full text-xs bg-slate-50 border p-2.5 rounded-xl" />
+                </div>
                 <div className="bg-[#0B2240] text-white p-4 rounded-xl font-mono text-xs">{builtPrompt}</div>
-                <button onClick={() => handleTryInSandbox(builtPrompt)} className="w-full bg-[#6B1426] text-white p-2.5 rounded-xl font-bold text-xs">Move to Sandbox</button>
+                <button onClick={() => handleTryInSandbox(builtPrompt)} className="w-full bg-[#6B1426] text-white p-2.5 rounded-xl font-bold text-xs">Send to Sandbox</button>
               </div>
             )}
           </main>
